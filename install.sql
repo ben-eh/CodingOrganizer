@@ -2,3 +2,11 @@ DROP DATABASE IF EXISTS codingOrganizer;
 CREATE DATABASE codingOrganizer;
 USE codingOrganizer;
 
+CREATE TABLE users (
+
+  user_id INT UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY,
+  username VARBINARY(255) DEFAULT "",
+  password VARBINARY(255) DEFAULT "",
+  added_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+
+);
