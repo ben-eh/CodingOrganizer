@@ -8,6 +8,6 @@ CREATE TABLE entries (
   name VARCHAR(255) DEFAULT "",
   url VARCHAR(2083) DEFAULT "",
   codeblock TEXT,
-  note TEXT
+  notes TEXT
 
 );
