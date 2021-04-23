@@ -1,6 +1,7 @@
 package main
 
 import (
+	"encoding/json"
 	"fmt"
 	"io/ioutil"
 	"log"
@@ -15,7 +16,16 @@ func indexHandler(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		log.Fatal("Could not read index.html")
 	}
-	fmt.Fprintf(w, string(htmlPage))
+
+	var entries []entry.Entry
+	entries = database.GetEntries()
+	str, err := json.Marshal(entries)
+	if err != nil {
+		fmt.Fprintf(w, "there is an error")
+		return
+	}
+
+	fmt.Fprintf(w, string(htmlPage), str)
 }
 
 func addEntryHandler(w http.ResponseWriter, r *http.Request) {
