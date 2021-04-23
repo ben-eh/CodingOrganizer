@@ -2,6 +2,7 @@ package database
 
 import (
 	"database/sql"
+	"log"
 
 	"github.com/ben-eh/CodingOrganizer/entry"
 
@@ -27,15 +28,17 @@ func GetEntries() []entry.Entry {
 
 	for results.Next() {
 		var entry entry.Entry
-		err = results.Scan(&entry.ID, &entry.Name, &entry.URL, &entry.Notes)
+		err = results.Scan(&entry.ID, &entry.Name, &entry.URL, &entry.CodeBlock, &entry.Notes)
 		if err != nil {
 			panic(err.Error())
 		}
 		entries = append(entries, entry)
 	}
 
-	return entries
+	log.Println(len(entries))
+	log.Println("pause")
 
+	return entries
 }
 
 func SaveEntry(e entry.Entry) {

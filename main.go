@@ -3,6 +3,7 @@ package main
 import (
 	"encoding/json"
 	"fmt"
+	"html/template"
 	"io/ioutil"
 	"log"
 	"net/http"
@@ -11,11 +12,17 @@ import (
 	"github.com/ben-eh/CodingOrganizer/entry"
 )
 
+var tpl *template.Template
+
+func init() {
+	tpl = template.Must(template.ParseGlob("templates/*.gohtml"))
+}
+
 func indexHandler(w http.ResponseWriter, r *http.Request) {
-	htmlPage, err := ioutil.ReadFile("index.html")
-	if err != nil {
-		log.Fatal("Could not read index.html")
-	}
+	// htmlPage, err := ioutil.ReadFile("index.html")
+	// if err != nil {
+	// 	log.Fatal("Could not read index.html")
+	// }
 
 	var entries []entry.Entry
 	entries = database.GetEntries()
@@ -25,7 +32,10 @@ func indexHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	fmt.Fprintf(w, string(htmlPage), str)
+	t, _ := template.ParseFiles("index.html")
+	t.Execute(w, str)
+	// tpl.ExecuteTemplate(w, "index.gohtml", "test string")
+	// fmt.Fprintf(w, string(htmlPage), str)
 }
 
 func addEntryHandler(w http.ResponseWriter, r *http.Request) {
