@@ -8,5 +8,10 @@
 </head>
 <body>
   <h1>Knowledge Base</h1>
+  {{range $index, $entry := .}}
+  <a href="/showEntry">Show me the page</a>
+  <p>Entry name is {{.Name}}</p>
+  <p>Entry URL is {{.URL}}</p>
+  {{end}}
 </body>
 </html>

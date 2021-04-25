@@ -1,7 +1,6 @@
 package main
 
 import (
-	"encoding/json"
 	"fmt"
 	"html/template"
 	"io/ioutil"
@@ -12,11 +11,11 @@ import (
 	"github.com/ben-eh/CodingOrganizer/entry"
 )
 
-var tpl *template.Template
+// var tpl *template.Template
 
-func init() {
-	tpl = template.Must(template.ParseGlob("templates/*.gohtml"))
-}
+// func init() {
+// 	tpl = template.Must(template.ParseGlob("templates/*.gohtml"))
+// }
 
 func indexHandler(w http.ResponseWriter, r *http.Request) {
 	// htmlPage, err := ioutil.ReadFile("index.html")
@@ -26,16 +25,25 @@ func indexHandler(w http.ResponseWriter, r *http.Request) {
 
 	var entries []entry.Entry
 	entries = database.GetEntries()
-	str, err := json.Marshal(entries)
-	if err != nil {
-		fmt.Fprintf(w, "there is an error")
-		return
-	}
+	// str, err := json.Marshal(entries)
+	// if err != nil {
+	// 	fmt.Fprintf(w, "there is an error")
+	// 	return
+	// }
+
+	// str := entries
 
 	t, _ := template.ParseFiles("index.html")
-	t.Execute(w, str)
-	// tpl.ExecuteTemplate(w, "index.gohtml", "test string")
+	t.Execute(w, entries)
+	// tpl.ExecuteTemplate(w, "index.gohtml", ".", entries)
 	// fmt.Fprintf(w, string(htmlPage), str)
+}
+
+func showEntryHandler(w http.ResponseWriter, r *http.Request) {
+	entry := database.ShowEntry()
+
+	t, _ := template.ParseFiles("show.html")
+	t.Execute(w, entry)
 }
 
 func addEntryHandler(w http.ResponseWriter, r *http.Request) {
@@ -67,6 +75,7 @@ func initWebServer() {
 	http.HandleFunc("/", indexHandler)
 	http.HandleFunc("/addEntry", addEntryHandler)
 	http.HandleFunc("/saveEntry", saveEntryHandler)
+	http.HandleFunc("/showEntry", showEntryHandler)
 	log.Fatal(http.ListenAndServe(":8080", nil))
 }
 
