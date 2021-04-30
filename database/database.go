@@ -4,6 +4,7 @@ import (
 	"database/sql"
 	"log"
 	"net/http"
+	"reflect"
 
 	"github.com/ben-eh/CodingOrganizer/entry"
 	"github.com/gorilla/mux"
@@ -59,6 +60,17 @@ func SaveEntry(e entry.Entry) {
 	}
 }
 
+func UpdateEntry(e entry.Entry) {
+	db := DBConnection()
+	defer db.Close()
+
+	// Execute the query
+	_, err2 := db.Query("UPDATE entries SET name=?, url=?, codeblock=?, notes=? WHERE `entry_id` ='?'", e.Name, e.URL, e.CodeBlock, e.Notes, e.ID)
+	if err2 != nil {
+		panic(err2.Error()) // proper error handling instead of panic in your app
+	}
+}
+
 func FetchEntry(r *http.Request) entry.Entry {
 	db := DBConnection()
 	defer db.Close()
@@ -66,7 +78,7 @@ func FetchEntry(r *http.Request) entry.Entry {
 	vars := mux.Vars(r)
 
 	entryID := vars["entry_id"]
-	log.Println(entryID)
+	log.Println(reflect.TypeOf(entryID))
 
 	results, err := db.Query("SELECT * FROM entries WHERE `entry_id`= '" + entryID + "'")
 	if err != nil {

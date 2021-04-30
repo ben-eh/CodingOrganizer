@@ -6,6 +6,7 @@ import (
 	"io/ioutil"
 	"log"
 	"net/http"
+	"strconv"
 
 	"github.com/ben-eh/CodingOrganizer/database"
 	"github.com/ben-eh/CodingOrganizer/entry"
@@ -40,6 +41,23 @@ func indexHandler(w http.ResponseWriter, r *http.Request) {
 	// fmt.Fprintf(w, string(htmlPage), str)
 }
 
+func saveEntryHandler(w http.ResponseWriter, r *http.Request) {
+	postedName := r.FormValue("name")
+	postedURL := r.FormValue("url")
+	postedBlock := r.FormValue("codeblock")
+	postedNotes := r.FormValue("notes")
+	if postedName != "" {
+		e := &entry.Entry{
+			Name:      postedName,
+			URL:       postedURL,
+			CodeBlock: postedBlock,
+			Notes:     postedNotes,
+		}
+		database.SaveEntry(*e)
+	}
+	http.Redirect(w, r, "/", 301)
+}
+
 func addEntryHandler(w http.ResponseWriter, r *http.Request) {
 	htmlPage, err := ioutil.ReadFile("addEntry.html")
 	if err != nil {
@@ -58,23 +76,25 @@ func showEntryHandler(w http.ResponseWriter, r *http.Request) {
 func editEntryHandler(w http.ResponseWriter, r *http.Request) {
 	entry := database.FetchEntry(r)
 
-	t, _ := template.ParseFiles("edit.html")
+	t, _ := template.ParseFiles("editEntry.html")
 	t.Execute(w, entry)
 }
 
-func saveEntryHandler(w http.ResponseWriter, r *http.Request) {
+func updateEntryHandler(w http.ResponseWriter, r *http.Request) {
+	postedID, _ := strconv.Atoi(r.FormValue("id"))
 	postedName := r.FormValue("name")
 	postedURL := r.FormValue("url")
 	postedBlock := r.FormValue("codeblock")
 	postedNotes := r.FormValue("notes")
 	if postedName != "" {
 		e := &entry.Entry{
+			ID:        postedID,
 			Name:      postedName,
 			URL:       postedURL,
 			CodeBlock: postedBlock,
 			Notes:     postedNotes,
 		}
-		database.SaveEntry(*e)
+		database.UpdateEntry(*e)
 	}
 	http.Redirect(w, r, "/", 301)
 }
@@ -96,7 +116,8 @@ func main() {
 	r.HandleFunc("/addEntry", addEntryHandler)
 	r.HandleFunc("/saveEntry", saveEntryHandler)
 	r.HandleFunc("/showEntry/{entry_id}", showEntryHandler)
-	r.HandleFunc("/updateEntry/{entry_id}", editEntryHandler)
+	r.HandleFunc("/editEntry/{entry_id}", editEntryHandler)
+	r.HandleFunc("/updateEntry/{entry_id}", updateEntryHandler)
 	log.Fatal(http.ListenAndServe(":8080", r))
 	// http.Handle("/", r)
 }
