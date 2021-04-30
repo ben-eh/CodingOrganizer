@@ -9,6 +9,7 @@ import (
 
 	"github.com/ben-eh/CodingOrganizer/database"
 	"github.com/ben-eh/CodingOrganizer/entry"
+	"github.com/gorilla/mux"
 )
 
 // var tpl *template.Template
@@ -39,19 +40,26 @@ func indexHandler(w http.ResponseWriter, r *http.Request) {
 	// fmt.Fprintf(w, string(htmlPage), str)
 }
 
-func showEntryHandler(w http.ResponseWriter, r *http.Request) {
-	entry := database.ShowEntry()
-
-	t, _ := template.ParseFiles("show.html")
-	t.Execute(w, entry)
-}
-
 func addEntryHandler(w http.ResponseWriter, r *http.Request) {
 	htmlPage, err := ioutil.ReadFile("addEntry.html")
 	if err != nil {
 		log.Fatal("Could not read addEntry.html")
 	}
 	fmt.Fprintf(w, string(htmlPage))
+}
+
+func showEntryHandler(w http.ResponseWriter, r *http.Request) {
+	entry := database.FetchEntry(r)
+
+	t, _ := template.ParseFiles("show.html")
+	t.Execute(w, entry)
+}
+
+func editEntryHandler(w http.ResponseWriter, r *http.Request) {
+	entry := database.FetchEntry(r)
+
+	t, _ := template.ParseFiles("edit.html")
+	t.Execute(w, entry)
 }
 
 func saveEntryHandler(w http.ResponseWriter, r *http.Request) {
@@ -71,14 +79,24 @@ func saveEntryHandler(w http.ResponseWriter, r *http.Request) {
 	http.Redirect(w, r, "/", 301)
 }
 
-func initWebServer() {
-	http.HandleFunc("/", indexHandler)
-	http.HandleFunc("/addEntry", addEntryHandler)
-	http.HandleFunc("/saveEntry", saveEntryHandler)
-	http.HandleFunc("/showEntry", showEntryHandler)
-	log.Fatal(http.ListenAndServe(":8080", nil))
-}
+// func initWebServer() {
+// r := mux.NewRouter()
+// r.HandleFunc("/", indexHandler)
+// r.HandleFunc("/addEntry", addEntryHandler)
+// r.HandleFunc("/saveEntry", saveEntryHandler)
+// r.HandleFunc("/showEntry/{entry_id}", showEntryHandler)
+// 	log.Fatal(http.ListenAndServe(":8080", nil))
+// }
 
 func main() {
-	initWebServer()
+	// initWebServer()
+	r := mux.NewRouter()
+	// r.Host("http://localhost/8080")
+	r.HandleFunc("/", indexHandler)
+	r.HandleFunc("/addEntry", addEntryHandler)
+	r.HandleFunc("/saveEntry", saveEntryHandler)
+	r.HandleFunc("/showEntry/{entry_id}", showEntryHandler)
+	r.HandleFunc("/updateEntry/{entry_id}", editEntryHandler)
+	log.Fatal(http.ListenAndServe(":8080", r))
+	// http.Handle("/", r)
 }

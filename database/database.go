@@ -3,8 +3,10 @@ package database
 import (
 	"database/sql"
 	"log"
+	"net/http"
 
 	"github.com/ben-eh/CodingOrganizer/entry"
+	"github.com/gorilla/mux"
 
 	_ "github.com/go-sql-driver/mysql"
 )
@@ -57,11 +59,16 @@ func SaveEntry(e entry.Entry) {
 	}
 }
 
-func ShowEntry() entry.Entry {
+func FetchEntry(r *http.Request) entry.Entry {
 	db := DBConnection()
 	defer db.Close()
 
-	results, err := db.Query("SELECT * FROM entries WHERE `entry_id` = '1'")
+	vars := mux.Vars(r)
+
+	entryID := vars["entry_id"]
+	log.Println(entryID)
+
+	results, err := db.Query("SELECT * FROM entries WHERE `entry_id`= '" + entryID + "'")
 	if err != nil {
 		panic(err.Error())
 	}
