@@ -9,7 +9,7 @@
 <body>
   <h1>Edit an Entry</h1>
   <form method="post" action="/updateEntry/{{.ID}}">
-    <input type="hidden" name="id" value="{{.ID}}">
+    <!-- <input type="hidden" name="id" value="{{.ID}}"> -->
     <p>Name: <input type="text" name="name" value="{{.Name}}"/></p>
     <p>url: <input type="text" name="url" value="{{.URL}}"/></p>
     <p>code block: <input type="text" name="codeblock" value="{{.CodeBlock}}"/></p>

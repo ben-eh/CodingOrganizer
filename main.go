@@ -6,7 +6,6 @@ import (
 	"io/ioutil"
 	"log"
 	"net/http"
-	"strconv"
 
 	"github.com/ben-eh/CodingOrganizer/database"
 	"github.com/ben-eh/CodingOrganizer/entry"
@@ -74,6 +73,7 @@ func showEntryHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func editEntryHandler(w http.ResponseWriter, r *http.Request) {
+	log.Println("this msg should pop up as soon as I hit edit entry")
 	entry := database.FetchEntry(r)
 
 	t, _ := template.ParseFiles("editEntry.html")
@@ -81,20 +81,24 @@ func editEntryHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func updateEntryHandler(w http.ResponseWriter, r *http.Request) {
-	postedID, _ := strconv.Atoi(r.FormValue("id"))
+	// postedID, _ := strconv.Atoi(r.FormValue("id"))
+	vars := mux.Vars(r)
+
+	entryID := vars["entry_id"]
+	log.Println("this is the entry_id in the updateEntryHandler: ", entryID)
 	postedName := r.FormValue("name")
 	postedURL := r.FormValue("url")
 	postedBlock := r.FormValue("codeblock")
 	postedNotes := r.FormValue("notes")
 	if postedName != "" {
 		e := &entry.Entry{
-			ID:        postedID,
+			// ID:        postedID,
 			Name:      postedName,
 			URL:       postedURL,
 			CodeBlock: postedBlock,
 			Notes:     postedNotes,
 		}
-		database.UpdateEntry(*e)
+		database.UpdateEntry(r, *e)
 	}
 	http.Redirect(w, r, "/", 301)
 }
