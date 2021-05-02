@@ -2,7 +2,6 @@ package database
 
 import (
 	"database/sql"
-	"fmt"
 	"log"
 	"net/http"
 
@@ -71,7 +70,7 @@ func UpdateEntry(r *http.Request, e entry.Entry) {
 
 	log.Println("this should be the entry id: ", entryID)
 
-	queryString := fmt.Sprintf("UPDATE entries SET name=?, url=?, codeblock=?, notes=? WHERE entry_id='%v'", entryID)
+	queryString := "UPDATE entries SET name=?, url=?, codeblock=?, notes=? WHERE entry_id=?"
 
 	log.Println(queryString)
 
@@ -82,6 +81,21 @@ func UpdateEntry(r *http.Request, e entry.Entry) {
 		panic(err2.Error()) // proper error handling instead of panic in your app
 	}
 	log.Println(result)
+}
+
+func DeleteEntry(r *http.Request) {
+	db := DBConnection()
+	defer db.Close()
+
+	vars := mux.Vars(r)
+	entryID := vars["entry_id"]
+
+	_, err := db.Query("DELETE FROM entries WHERE entry_id=?", entryID)
+	if err != nil {
+		panic(err.Error())
+	}
+
+	log.Println("this is the entry ID in the delete Entry db function: ", entryID)
 }
 
 func FetchEntry(r *http.Request) entry.Entry {
