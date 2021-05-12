@@ -35,7 +35,7 @@ func GetEntries() []entry.Entry {
 
 	for results.Next() {
 		var entry entry.Entry
-		err := results.Scan(&entry.ID, &entry.Name, &entry.URL, &entry.CodeBlock, &entry.Notes)
+		err := results.Scan(&entry.ID, &entry.Name, &entry.URL, &entry.CodeBlock, &entry.Notes, &entry.Categories)
 		if err != nil {
 			panic(err.Error())
 		}
@@ -116,7 +116,7 @@ func FetchEntry(r *http.Request) entry.Entry {
 
 	var entry entry.Entry
 	if results.Next() {
-		err2 := results.Scan(&entry.ID, &entry.Name, &entry.URL, &entry.CodeBlock, &entry.Notes)
+		err2 := results.Scan(&entry.ID, &entry.Name, &entry.URL, &entry.CodeBlock, &entry.Notes, &entry.Categories)
 		if err2 != nil {
 			panic(err2.Error())
 		}

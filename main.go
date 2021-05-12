@@ -58,7 +58,7 @@ func saveEntryHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func addEntryHandler(w http.ResponseWriter, r *http.Request) {
-	htmlPage, err := ioutil.ReadFile("templates/addEntry.html")
+	htmlPage, err := ioutil.ReadFile("addEntry.html")
 	if err != nil {
 		log.Fatal("Could not read addEntry.html")
 	}
