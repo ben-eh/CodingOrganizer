@@ -7,15 +7,30 @@
   <title>Document</title>
 </head>
 <body>
-  <h1>Edit an Entry</h1>
-  <form method="post" action="/updateEntry/{{.ID}}">
-    <!-- <input type="hidden" name="id" value="{{.ID}}"> -->
-    <p>Name: <input type="text" name="name" value="{{.Name}}"/></p>
-    <p>url: <input type="text" name="url" value="{{.URL}}"/></p>
-    <p>code block: <input type="text" name="codeblock" value="{{.CodeBlock}}"/></p>
-    <p>notes: <input type="text" name="notes" value="{{.Notes}}"/></p>
-    <p><input type="reset" value="Clear" /> <input type="submit" value="Submit"></p>
-  </form>
-  <button><a href="/">Cancel Editing</a></button>
+  <div style="float:left; width:50%">
+    <h1>Edit an Entry</h1>
+    <form method="post" action="/updateEntry/{{.Entry.ID}}">
+      <p>Name: <input type="text" name="name" value="{{.Entry.Name}}"/></p>
+      <p>url: <input type="text" name="url" value="{{.Entry.URL}}"/></p>
+      <p>code block: <input type="text" name="codeblock" value="{{.Entry.CodeBlock}}"/></p>
+      <p>notes: <input type="text" name="notes" value="{{.Entry.Notes}}"/></p>
+      <p><input type="reset" value="Clear" /> <input type="submit" value="Submit"></p>
+    </form>
+    <button><a href="/">Cancel Editing</a></button>
+  </div>
+
+  <div style="float:left; max-width:50%">
+    <h1>Tags</h1>
+    <ul>
+      {{range $index, $tag := .AllTags}}
+        <li>
+          <input type="checkbox" name="[]tags" value="{{$tag.ID}}" />
+          <span>
+            {{$tag.Name}}
+          </span>
+        </li>
+      {{end}}
+    </ul>
+  </div>
 </body>
 </html>

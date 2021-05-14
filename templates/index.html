@@ -7,13 +7,35 @@
   <title>Document</title>
 </head>
 <body>
-  <h1>Knowledge Base</h1>
-  <ul>
-    {{range $index, $entry := .}}
-      <li><a href="/showEntry/{{.ID}}">{{.Name}}</a></li>
-    {{end}}
-  </ul>
-  <button><a href="/addEntry">Add an Entry</a></button>
+  <!-- <ul>
+    <li>{{.Entries}}</li>
+    <li>{{.Tags}}</li>
+  </ul> -->
+  
+  <div style="float:left; width:50%">
+    <h1>Knowledge Base</h1>
+    <ul>
+      {{range $index, $entry := .Entries}}
+        <li><a href="/showEntry/{{$entry.ID}}">{{$entry.Name}}</a>
+          {{range $i, $tag := .Tags}}
+          <span>{{$tag.Name}},</span>
+          {{end}}
+        </li>
+      {{end}}
+    </ul>
+    <button><a href="/addEntry">Add an Entry</a></button>
+  </div>
+
+  <div style="float:left; max-width:50%">
+    <h1>Tags</h1>
+    <ul>
+      {{range $index, $tag := .Tags}}
+        <li>
+          {{$tag.Name}}
+        </li>
+      {{end}}
+    </ul>
+  </div>
 
   
 </body>

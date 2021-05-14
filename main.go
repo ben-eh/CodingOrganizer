@@ -7,7 +7,6 @@ import (
 	"log"
 	"net/http"
 
-	"github.com/ben-eh/CodingOrganizer/database"
 	"github.com/ben-eh/CodingOrganizer/entry"
 	"github.com/gorilla/mux"
 )
@@ -18,26 +17,29 @@ import (
 // 	tpl = template.Must(template.ParseGlob("templates/*.gohtml"))
 // }
 
+type IndexData struct {
+	Entries []entry.Entry
+	Tags    []entry.Tag
+}
+
+type SoloData struct {
+	Entry   entry.Entry
+	AllTags []entry.Tag
+}
+
 func indexHandler(w http.ResponseWriter, r *http.Request) {
-	// htmlPage, err := ioutil.ReadFile("index.html")
-	// if err != nil {
-	// 	log.Fatal("Could not read index.html")
-	// }
 
 	var entries []entry.Entry
-	entries = database.GetEntries()
-	// str, err := json.Marshal(entries)
-	// if err != nil {
-	// 	fmt.Fprintf(w, "there is an error")
-	// 	return
-	// }
+	entries = entry.GetEntries()
+	var tags []entry.Tag
+	tags = entry.GetAllTags()
 
-	// str := entries
-
+	data := IndexData{
+		Entries: entries,
+		Tags:    tags,
+	}
 	t, _ := template.ParseFiles("templates/index.html")
-	t.Execute(w, entries)
-	// tpl.ExecuteTemplate(w, "index.gohtml", ".", entries)
-	// fmt.Fprintf(w, string(htmlPage), str)
+	t.Execute(w, data)
 }
 
 func saveEntryHandler(w http.ResponseWriter, r *http.Request) {
@@ -52,7 +54,7 @@ func saveEntryHandler(w http.ResponseWriter, r *http.Request) {
 			CodeBlock: postedBlock,
 			Notes:     postedNotes,
 		}
-		database.SaveEntry(*e)
+		entry.SaveEntry(*e)
 	}
 	http.Redirect(w, r, "/", 301)
 }
@@ -66,18 +68,25 @@ func addEntryHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func showEntryHandler(w http.ResponseWriter, r *http.Request) {
-	entry := database.FetchEntry(r)
+	entry := entry.FetchEntry(r)
 
 	t, _ := template.ParseFiles("templates/show.html")
 	t.Execute(w, entry)
 }
 
 func editEntryHandler(w http.ResponseWriter, r *http.Request) {
-	log.Println("this msg should pop up as soon as I hit edit entry")
-	entry := database.FetchEntry(r)
+
+	e := entry.FetchEntry(r)
+	var allTags []entry.Tag
+	allTags = entry.GetAllTags()
+
+	data := SoloData{
+		Entry:   e,
+		AllTags: allTags,
+	}
 
 	t, _ := template.ParseFiles("templates/editEntry.html")
-	t.Execute(w, entry)
+	t.Execute(w, data)
 }
 
 func updateEntryHandler(w http.ResponseWriter, r *http.Request) {
@@ -98,13 +107,13 @@ func updateEntryHandler(w http.ResponseWriter, r *http.Request) {
 			CodeBlock: postedBlock,
 			Notes:     postedNotes,
 		}
-		database.UpdateEntry(r, *e)
+		entry.UpdateEntry(r, *e)
 	}
 	http.Redirect(w, r, "/", 301)
 }
 
 func deleteEntryHandler(w http.ResponseWriter, r *http.Request) {
-	database.DeleteEntry(r)
+	entry.DeleteEntry(r)
 	http.Redirect(w, r, "/", 301)
 }
 
