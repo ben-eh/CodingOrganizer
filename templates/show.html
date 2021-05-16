@@ -12,6 +12,11 @@
   <p>{{.URL}}</p>
   <p>{{.CodeBlock}}</p>
   <p>{{.Notes}}</p>
+  <p>Tags: 
+  {{range $index, $tag := .Tags}}
+    <button>{{$tag.Name}}</button>
+  {{end}}
+  </p>  
   <button><a href="/editEntry/{{.ID}}">Edit Entry</a></button>
   <button><a href="/">Back to Main Page</a></button>
   <button><a href="/deleteEntry/{{.ID}}">Delete Entry</a></button>

@@ -133,6 +133,7 @@ func FetchEntry(r *http.Request) Entry {
 	defer db.Close()
 
 	vars := mux.Vars(r)
+	log.Println("pause")
 
 	entryID := vars["entry_id"]
 	// log.Println(reflect.TypeOf(entryID))
