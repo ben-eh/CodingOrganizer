@@ -81,6 +81,7 @@ func GetAllTags() []Tag {
 func SaveEntry(e Entry) {
 	db := database.DBConnection()
 	defer db.Close()
+	log.Println("pause")
 
 	// Execute the query
 	_, err2 := db.Query("INSERT INTO entries SET name=?, url=?, codeblock=?, notes=?", e.Name, e.URL, e.CodeBlock, e.Notes)
@@ -133,7 +134,6 @@ func FetchEntry(r *http.Request) Entry {
 	defer db.Close()
 
 	vars := mux.Vars(r)
-	log.Println("pause")
 
 	entryID := vars["entry_id"]
 	// log.Println(reflect.TypeOf(entryID))

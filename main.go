@@ -1,11 +1,10 @@
 package main
 
 import (
-	"fmt"
 	"html/template"
-	"io/ioutil"
 	"log"
 	"net/http"
+	"reflect"
 
 	"github.com/ben-eh/CodingOrganizer/entry"
 	"github.com/gorilla/mux"
@@ -43,28 +42,58 @@ func indexHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func saveEntryHandler(w http.ResponseWriter, r *http.Request) {
-	postedName := r.FormValue("name")
-	postedURL := r.FormValue("url")
-	postedBlock := r.FormValue("codeblock")
-	postedNotes := r.FormValue("notes")
-	if postedName != "" {
-		e := &entry.Entry{
-			Name:      postedName,
-			URL:       postedURL,
-			CodeBlock: postedBlock,
-			Notes:     postedNotes,
-		}
-		entry.SaveEntry(*e)
+	err := r.ParseForm()
+	if err != nil {
+		panic(err.Error())
 	}
+
+	log.Println(r.Form)
+	log.Println(reflect.TypeOf(r.Form["name"]))
+	log.Println(r.Form["name"])
+	log.Println("pause")
+
+	// postedTags := r.Form("tags")
+	// postedName := r.Form("name")
+	// postedURL := r.Form("url")
+	// postedBlock := r.Form("codeblock")
+	// postedNotes := r.Form("notes")
+	// if r.Form["name"] != "" {
+	// 	e := &entry.Entry{
+	// 		Name:      postedName,
+	// 		URL:       postedURL,
+	// 		CodeBlock: postedBlock,
+	// 		Notes:     postedNotes,
+	// 	}
+	// 	log.Println("pause")
+	// 	entry.SaveEntry(*e)
+	// }
+
+	// postedTags := r.Form("tags")
+	// postedName := r.Form("name")
+	// postedURL := r.Form("url")
+	// postedBlock := r.Form("codeblock")
+	// postedNotes := r.Form("notes")
+	// if postedName != "" {
+	// 	e := &entry.Entry{
+	// 		Name:      postedName,
+	// 		URL:       postedURL,
+	// 		CodeBlock: postedBlock,
+	// 		Notes:     postedNotes,
+	// 	}
+	// 	log.Println("pause")
+	// 	entry.SaveEntry(*e)
+	// }
 	http.Redirect(w, r, "/", 301)
 }
 
 func addEntryHandler(w http.ResponseWriter, r *http.Request) {
-	htmlPage, err := ioutil.ReadFile("addEntry.html")
-	if err != nil {
-		log.Fatal("Could not read addEntry.html")
-	}
-	fmt.Fprintf(w, string(htmlPage))
+
+	var allTags []entry.Tag
+	allTags = entry.GetAllTags()
+
+	t, _ := template.ParseFiles("templates/addEntry.html")
+	t.Execute(w, allTags)
+
 }
 
 func showEntryHandler(w http.ResponseWriter, r *http.Request) {
