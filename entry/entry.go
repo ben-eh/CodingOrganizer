@@ -78,16 +78,23 @@ func GetAllTags() []Tag {
 
 }
 
-func SaveEntry(e Entry) {
+func SaveEntry(e Entry) int {
 	db := database.DBConnection()
 	defer db.Close()
-	log.Println("pause")
 
 	// Execute the query
-	_, err2 := db.Query("INSERT INTO entries SET name=?, url=?, codeblock=?, notes=?", e.Name, e.URL, e.CodeBlock, e.Notes)
+	res, err2 := db.Exec("INSERT INTO entries SET name=?, url=?, codeblock=?, notes=?", e.Name, e.URL, e.CodeBlock, e.Notes)
 	if err2 != nil {
 		panic(err2.Error()) // proper error handling instead of panic in your app
 	}
+
+	lastID, err := res.LastInsertId()
+	if err != nil {
+		panic(err.Error())
+	}
+
+	return int(lastID)
+
 }
 
 func UpdateEntry(r *http.Request, e Entry) {

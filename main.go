@@ -4,9 +4,9 @@ import (
 	"html/template"
 	"log"
 	"net/http"
-	"reflect"
 
 	"github.com/ben-eh/CodingOrganizer/entry"
+	"github.com/ben-eh/CodingOrganizer/entryHasTag"
 	"github.com/gorilla/mux"
 )
 
@@ -47,42 +47,21 @@ func saveEntryHandler(w http.ResponseWriter, r *http.Request) {
 		panic(err.Error())
 	}
 
-	log.Println(r.Form)
-	log.Println(reflect.TypeOf(r.Form["name"]))
-	log.Println(r.Form["name"])
+	tags := r.Form["[]tags"]
+	log.Println(tags)
 	log.Println("pause")
 
-	// postedTags := r.Form("tags")
-	// postedName := r.Form("name")
-	// postedURL := r.Form("url")
-	// postedBlock := r.Form("codeblock")
-	// postedNotes := r.Form("notes")
-	// if r.Form["name"] != "" {
-	// 	e := &entry.Entry{
-	// 		Name:      postedName,
-	// 		URL:       postedURL,
-	// 		CodeBlock: postedBlock,
-	// 		Notes:     postedNotes,
-	// 	}
-	// 	log.Println("pause")
-	// 	entry.SaveEntry(*e)
-	// }
+	if r.FormValue("name") != "" {
+		e := &entry.Entry{
+			Name:      r.FormValue("name"),
+			URL:       r.FormValue("url"),
+			CodeBlock: r.FormValue("codeblock"),
+			Notes:     r.FormValue("notes"),
+		}
+		entryID := entry.SaveEntry(*e)
+		entryHasTag.CreateEntryHasTag(tags, entryID)
+	}
 
-	// postedTags := r.Form("tags")
-	// postedName := r.Form("name")
-	// postedURL := r.Form("url")
-	// postedBlock := r.Form("codeblock")
-	// postedNotes := r.Form("notes")
-	// if postedName != "" {
-	// 	e := &entry.Entry{
-	// 		Name:      postedName,
-	// 		URL:       postedURL,
-	// 		CodeBlock: postedBlock,
-	// 		Notes:     postedNotes,
-	// 	}
-	// 	log.Println("pause")
-	// 	entry.SaveEntry(*e)
-	// }
 	http.Redirect(w, r, "/", 301)
 }
 
