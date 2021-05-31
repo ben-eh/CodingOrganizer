@@ -53,6 +53,22 @@ func GetEntries() []Entry {
 	return entries
 }
 
+// func dynamicSearch(r *http.Request) []Entry {
+
+// 	db := database.DBConnection()
+// 	defer db.Close()
+
+// 	results, err2 := db.Query("SELECT * FROM entries WHERE ")
+// 	if err2 != nil {
+// 		panic(err2.Error())
+// 	}
+
+// 	vars := mux.Vars(r)
+// 	log.Println(vars)
+// 	log.Println("pause")
+
+// }
+
 func GetAllTags() []Tag {
 	db := database.DBConnection()
 	defer db.Close()

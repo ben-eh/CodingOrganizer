@@ -41,6 +41,14 @@ func indexHandler(w http.ResponseWriter, r *http.Request) {
 	t.Execute(w, data)
 }
 
+func indexSearchHandler(w http.ResponseWriter, r *http.Request) {
+
+	tags := entry.GetAllTags()
+
+	t, _ := template.ParseFiles("templates/indexSearch.html")
+	t.Execute(w, tags)
+}
+
 func saveEntryHandler(w http.ResponseWriter, r *http.Request) {
 	err := r.ParseForm()
 	if err != nil {
@@ -139,6 +147,7 @@ func main() {
 	r := mux.NewRouter()
 	// r.Host("http://localhost/8080")
 	r.HandleFunc("/", indexHandler)
+	r.HandleFunc("/indexSearch", indexSearchHandler)
 	r.HandleFunc("/addEntry", addEntryHandler)
 	r.HandleFunc("/saveEntry", saveEntryHandler)
 	r.HandleFunc("/showEntry/{entry_id}", showEntryHandler)

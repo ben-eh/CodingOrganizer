@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Document</title>
+</head>
+<body>
+
+  <h1>Dynamic Search Page</h1>
+
+  <form action="/dynamicSearch">
+    <p>Search: <input type="text" name="name"></p>
+    <h4>Tags</h4>
+    <ul>
+      {{range $index, $tag := .}}
+        <li>
+          <input type="checkbox" name="[]tags" value="{{$tag.ID}}" />
+          <span>
+            {{$tag.Name}}
+          </span>
+        </li>
+      {{end}}
+    </ul>
+    
+  </form>
+
+  <script>
+    (function (){
+      document.querySelector('#ajaxButton').onclick = function () {
+        makeRequest('/');
+      };
+
+      var httpRequest = new XMLHttpRequest();
+
+      function makeRequest(url) {
+        httpRequest.onreadystatechange = alertContents;
+        httpRequest.open('GET', url);
+        httpRequest.send();
+      }
+
+        function alertContents() {
+          if (httpRequest.readyState === 4) {
+            if (httpRequest.status === 200) {
+              alert(httpRequest.responseText);
+            } else {
+              alert('There was a problem with the request');
+            }
+          }
+        }
+
+    })();
+  </script>
+</body>
+</html>
