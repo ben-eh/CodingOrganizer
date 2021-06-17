@@ -1,9 +1,12 @@
 package main
 
 import (
+	"flag"
 	"html/template"
 	"log"
+	"mime"
 	"net/http"
+	"time"
 
 	"github.com/ben-eh/CodingOrganizer/entry"
 	"github.com/ben-eh/CodingOrganizer/entryHasTag"
@@ -28,6 +31,8 @@ type SoloData struct {
 
 func indexHandler(w http.ResponseWriter, r *http.Request) {
 
+	mime.AddExtensionType(".html", "text/css")
+
 	var entries []entry.Entry
 	entries = entry.GetEntries()
 	var tags []entry.Tag
@@ -37,6 +42,7 @@ func indexHandler(w http.ResponseWriter, r *http.Request) {
 		Entries: entries,
 		Tags:    tags,
 	}
+	// w.Header().Set("Content-Type", "text/css")
 	t, _ := template.ParseFiles("templates/index.html")
 	t.Execute(w, data)
 }
@@ -133,18 +139,25 @@ func deleteEntryHandler(w http.ResponseWriter, r *http.Request) {
 	http.Redirect(w, r, "/", 301)
 }
 
-// func initWebServer() {
-// r := mux.NewRouter()
-// r.HandleFunc("/", indexHandler)
-// r.HandleFunc("/addEntry", addEntryHandler)
-// r.HandleFunc("/saveEntry", saveEntryHandler)
-// r.HandleFunc("/showEntry/{entry_id}", showEntryHandler)
-// 	log.Fatal(http.ListenAndServe(":8080", nil))
-// }
+func handleStatic(w http.ResponseWriter, r *http.Request) http.Handler {
+	w.Header().Set("Content-Type", "text/css")
+	return http.StripPrefix("/static/", http.FileServer(http.Dir(".")))
+}
 
 func main() {
 	// initWebServer()
+	var dir string
+	flag.StringVar(&dir, "dir", ".", "the directory to serve files from. Defaults to the current dir")
+	flag.Parse()
 	r := mux.NewRouter()
+	srv := &http.Server{
+		Handler: r,
+		Addr:    "127.0.0.1:8080",
+		// Good practice: enforce timeouts for servers you create!
+		WriteTimeout: 15 * time.Second,
+		ReadTimeout:  15 * time.Second,
+	}
+	// r.PathPrefix("/static/").Handler(handleStatic)
 	// r.Host("http://localhost/8080")
 	r.HandleFunc("/", indexHandler)
 	r.HandleFunc("/indexSearch", indexSearchHandler)
@@ -154,6 +167,6 @@ func main() {
 	r.HandleFunc("/editEntry/{entry_id}", editEntryHandler)
 	r.HandleFunc("/updateEntry/{entry_id}", updateEntryHandler)
 	r.HandleFunc("/deleteEntry/{entry_id}", deleteEntryHandler)
-	log.Fatal(http.ListenAndServe(":8080", r))
+	log.Fatal(srv.ListenAndServe())
 	// http.Handle("/", r)
 }
